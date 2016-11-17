@@ -9,21 +9,21 @@ int* CopyThenBubbleSort(int* toCopy);
 void setFrequency(float frequency);
 
 
-const int outPin = 9; // output pin
-const float maxFreq = 16000000; //max freq supported by Arduino (16MHz)
+const int outPin = 9; // Code de la sortie
+const float maxFreq = 16000000; //Fréquence maximum supportée par l'arduino (16MHz)
 
 const int LED1 = 7;
 const int LED2 = 6;
 const int LED3 = 5;
 
-const int width = 100; //nombre de valeur analys�es
+const int width = 100; //nombre de valeur analysées
 
 int* values;
 
 void setup()
 {
 
-  Serial.begin(115200); //for sending A0 pin values
+  Serial.begin(115200); //Pour envoyer les valeurs du pin A0
   
   pinMode(outPin,OUTPUT);        //Signal generator pin
   pinMode(LED1,OUTPUT); 
@@ -33,7 +33,7 @@ void setup()
   values = new int[width];
  
   
-  setFrequency(350000); //generate a square wave 
+  setFrequency(350000); //génère une onde rectangulaire 
   
   //for test
   //Serial.println();
@@ -112,18 +112,17 @@ void loop()
  
 }
 
-//set frequency (Hz)
-//min frequency: 0.24 Hz
-//max frequency: 8MHz
+//Règle la fréquence (Hz)
+//Fréquence minimale: 0.24 Hz
+//Fréquence maximale : 8MHz
 void setFrequency(float frequency)
 {
  
   if(frequency >=0.24 || frequency <=8000000)
   {
     
-    TCCR1A=0b10000010;        // Set up frequency generator, mode 14 (Fast PWM)
+    TCCR1A=0b10000010;        // Règle la fréquence du générateur au mode 14 (PWM rapide)
     //WGM11 = 1, COM1A1 = 1
-    //Fast PWM: TOP=ICR1, update of OCR1x=BOTTOM, TOV1 Flag Set on TOP
     
   
     unsigned int v=0;
@@ -162,26 +161,26 @@ void setFrequency(float frequency)
     
     //WGM12 = 1, WGM13 = 1
     
-    //three last bit of TCCR1B:    CS12   CS11   CS10
-    // 0: no clock (timer stopped)  0      0      0
-    // clk/1: no prescaling         0      0      1 
+    //trois dernier bit de TCCR1B:    CS12   CS11   CS10
+    // 0: pas d'horloge (le décompte est stoppé)  0      0      0
+    // clk/1: aucun préréglages         0      0      1 
     // clk/8                        0      1      0
     // clk/64                       0      1      1
     // clk/256                      1      0      0
     // clk/1024                     1      0      1
 
     
-    ICR1=v; //pulse duration = ICR1 value x time per counter tick
+    ICR1=v; //durée de la pulsation = ICR1 valeur x temps par contre tick.
     
-    //for 16Mhz (chip frequency)
-    //Prescale	Time per counter tick
+    //Pour 16Mhz (Fréquence de la puce)
+    //Préréglages du temps par contre tick
     //1	        0.0625 uS
     //8	        0.5 uS
     //64	4 uS
     //256	16 uS
     //1024	64uS
     
-    OCR1A=v/2; //Output Compare Register //low state
+    OCR1A=v/2; //Output Compare Register //faible status
 
   }
   

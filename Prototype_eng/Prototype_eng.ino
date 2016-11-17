@@ -3,9 +3,22 @@
 // VLO 2013-2014
 //****************************************************************************************
 
+int GetCas();
+void pushValue(int value);
+int* CopyThenBubbleSort(int* toCopy);
+void setFrequency(float frequency);
+
 
 const int outPin = 9; // output pin
 const float maxFreq = 16000000; //max freq supported by Arduino (16MHz)
+
+const int LED1 = 7;
+const int LED2 = 6;
+const int LED3 = 5;
+
+const int width = 100; //nombre de valeur analys�es
+
+int* values;
 
 void setup()
 {
@@ -13,20 +26,86 @@ void setup()
   Serial.begin(115200); //for sending A0 pin values
   
   pinMode(outPin,OUTPUT);        //Signal generator pin
+  pinMode(LED1,OUTPUT); 
+  pinMode(LED2,OUTPUT); 
+  pinMode(LED3,OUTPUT); 
+
+  values = new int[width];
+ 
   
-  setFrequency(500); //generate a square wave (in this case at 1000Hz)
+  setFrequency(350000); //generate a square wave 
   
   //for test
   //Serial.println();
   //Serial.println(ICR1);
   //Serial.println(TCCR1B);
+
+  digitalWrite(LED1,HIGH);
+  delay (200);
+  digitalWrite(LED1,LOW);
+  digitalWrite(LED2,HIGH);
+  delay (200);
+  digitalWrite(LED2,LOW);
+  digitalWrite(LED3,HIGH);
+  delay (200);
+  digitalWrite(LED3,LOW);
+  delay (100);
+  digitalWrite(LED3,HIGH);
+  delay (200);
+  digitalWrite(LED3,LOW);
+  digitalWrite(LED2,HIGH);
+  delay (200);
+  digitalWrite(LED2,LOW);
+  digitalWrite(LED1,HIGH);
+  delay (200);
+  digitalWrite(LED1,LOW);
+  digitalWrite(LED1,HIGH);
+  digitalWrite(LED2,HIGH);
+  digitalWrite(LED3,HIGH);
+  delay (300);
 }
 
 void loop()
 {
 
 
-  int val = analogRead(0);                                              
+  int val = analogRead(0); 
+  
+  pushValue(val);  
+
+  int cas = GetCas();
+
+  switch(cas)
+  {
+    case 1: // 1 doigt
+    digitalWrite(LED1,HIGH);
+    digitalWrite(LED2,LOW);
+    digitalWrite(LED3,LOW);
+    break;
+
+    case 2: // 2 doigts
+    digitalWrite(LED1,LOW);
+    digitalWrite(LED2,HIGH);
+    digitalWrite(LED3,LOW);
+    break;
+
+
+    case 3: // main
+    digitalWrite(LED1,LOW);
+    digitalWrite(LED2,LOW);
+    digitalWrite(LED3,HIGH);
+    break;
+
+
+    default:
+    digitalWrite(LED1,LOW);
+    digitalWrite(LED2,LOW);
+    digitalWrite(LED3,LOW);
+    break;
+  }
+  
+
+                                 
   Serial.write( 0xff );                                                         
   Serial.write( (val >> 8) & 0xff );                                            
   Serial.write( val & 0xff );
@@ -108,3 +187,67 @@ void setFrequency(float frequency)
   
   
 }
+
+
+int GetCas()
+{
+  int* trier = CopyThenBubbleSort(values); //tri du tableau
+  int crete = trier[width-1] - trier[0];
+  delete trier;
+
+ if(crete < ((1.70 * 1023.0) / 5))
+    if(crete < ((0.70 * 1023.0) / 5))
+        if(crete < ((0.61 * 1023.0) / 5))
+          return 3;
+        else 
+        return 2;
+    else 
+    return 1;
+  else 
+  return 0;
+
+ 
+}
+
+
+void pushValue(int value)
+{
+  for (int i=0; i<width-1; i++)
+    values[i] = values[i+1];
+  values[width-1] = value;
+}
+
+
+int* CopyThenBubbleSort(int* toCopy)
+{
+  int *tab = new int[width];
+    for(int i = 0; i<width ; i++)
+    {
+       tab[i] = toCopy[i];
+    }
+
+  int temp;
+  for(int i = width-1; i>0; i--)
+  {
+      for(int j = 0; j<=i-1; j++)
+      {
+         if(tab[j+1] < tab[j])
+         {
+          temp = tab[j];
+          tab[j] = tab[j+1];
+          tab[j+1] = temp;
+         
+          }
+        
+        }
+  
+  }
+
+  return tab;
+}
+
+
+
+
+
+
